@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<p>Chapter 18</p>
+		<form method="GET" action="message.html">
+			Name: <input type="text" name="name"><br>
+			Message: <br><textarea name="message"></textarea><br>
+			<button type="submit">Send</button>
+		</form>
+
+		<form action="submit.html" id="predeterminado">
+			Value: <input type="text" name="value">
+			<button type="submit">Save</button>
+		</form>
+		<!--Other form fields-->
+		<p><input type="text" value="abc">(text)</p>
+		<p><input type="password" value="abc">(password)</p>
+		<p><input type="checkbox" checked>(checkbox)</p>
+		<p><input type="radio" name="choice" value="A">
+			<input type="radio" name="choice" value="B">
+			<input type="radio" name="choice" value="C"> (radio)</p>
+		<p><input type="file"> (file)</p>
+		<textarea>
+			one
+			two
+			three
+		</textarea>
+		<select>
+			<option>Pancakes</option>
+			<option>Pudding</option>
+			<option>Ice cream</option>
+		</select>
+		<br>
+
+		<!--Focus-->
+		<input type="text" id="foco">
+		<br><br>
+		<input type="text" tabindex=1> <a href=".">(help)</a>
+		<button onclick="console.log('ok')" tabindex=2>Ok</button>
+
+		<!--Disabled fields-->
+		<br>
+		<button>I'm all right</button>
+		<button disabled>I am out</button>
+		<br>
+
+		<input type="text" id="longitud"> length: <span id="length">0</span>
+		<br><br>
+
+		<!--La etiqueta label, asocia un fragmento del documento con un campo de entrada.-->
+		<label>
+			<input type="checkbox" id="purple"> Make this page purple
+		</label>
+		<br><br>
+
+		<!--Radio button es similar al checkbox-->
+		<label>
+			<input type="radio" name="color" value="orange"> Orange
+		</label>
+		<label>
+			<input type="radio" name="color" value="lightgreen"> Green
+		</label>
+		<label>
+			<input type="radio" name="color" value="lightblue"> Blue
+		</label>
+
+		<!--Select fields-->
+		<!--Cuando se incluye el atributo, multiple, en una etiqueta select, el usuario podrá elegir la cantidad de opciones que desee.-->
+		<!--Apretar control y elegir las opciones-->
+		<br><br>
+
+		<select multiple id="calc">
+			<option value="1">0001</option>
+			<option value="2">0010</option>
+			<option value="4">0100</option>
+			<option value="8">1000</option>
+		</select> = <span id="output">0</span>
+
+		<!--File fields-->
+		<br><br>
+		<input type="file" id="archivo">
+
+		<br><br>
+		<input type="file" id="lector" multiple>
+
+		<br><br>
+		Notes: <select id="lista"></select> <button id="boton">Add</button><br>
+		<textarea style="width: 100%" id="nota"></textarea>
+	</body>
+	<script type="text/javascript">
+		//Este capítulo explica en detalle el protocolo HTTP y explica como se puede acceder a él mediante JS.
+		//Las páginas HTML pueden incluir formularios, que permiten al usuario enviar información al servidor.
+
+		//Cuando el valor del atributo method del elemento form es GET, la información del formulario es agregada
+		//al final de la URL como una cadena de consulta.
+
+		//El signo de interrogación indica el final de la parte de la ruta de la URL y el inicio de la consulta. Le siguen pares de nombres 
+		//y valores correspondientes al atributo name de los elementos input que definen los campos del formulario, separados por &.
+		//Algunos caracteres de la cadenas de consulta deben tener formato de escape (se reemplazan por códigos extráños e.g. ? por %3F).
+		//Este formato, se llama codificación URL y usa un signo de porcentaje seguido de dos dígitos hexadecimales e.g. 3F es 63 en notación
+		//decimal, el código del carácter signo de interrogación. JS proporciona las funciones encodeURIComponent y decodeURIComponent 
+		//para codificar y decodificar este formato.
+
+		console.log(encodeURIComponent("Yes?"));
+		console.log(decodeURIComponent("Yes%3F"));
+
+		//Si cambiamos el valor del atributo method del elemento form a POST, la solicitud HTTP realizada para enviar el formulario colocará 
+		//la cadena de consulta en el cuerpo de la solicitud, en lugar de agregarla en la URL e.g. pg. 311
+
+		//Las solicitudes GET deben usarse para solicitudes que no tienen efectos secundarios i.e. solo piden información al servidor. En 
+		//cambio, las solicitudes POST, se usan para cambiar algo en el servidor e.g. para crear una cuenta o publicar un mensaje.
+
+		//fetch("data.txt");
+
+		document.getElementById("foco").focus();
+		console.log(document.activeElement.tagName);
+
+		document.getElementById("foco").blur();
+		console.log(document.activeElement.tagName);
+
+		//El formulario en su conjunto
+		let form = document.querySelector("form");
+		console.log(form.elements[1].type);
+		//console.log(form.elements.text.type);
+		console.log(form.elements.name.form == form);
+
+		let predeterminado = document.getElementById("predeterminado");
+		predeterminado.addEventListener("submit", event => {
+			console.log("Saving value" /*predeterminado.elements.value.value*/);
+			event.preventDefault();
+		});
+
+		//Text fields
+		//Cuando apretamos F2, el código de abajo inserta una palabra, cuando estamos dentro del textarea
+		//Útil para crear un control+Z
+		let textarea = document.querySelector("textarea");
+		textarea.addEventListener("keydown", event => {
+			if (event.keyCode == 113) {
+				replaceSelection(textarea, "Khasekhemwy");
+				event.preventDefault();
+			}
+		});
+
+		function replaceSelection(field, word) {
+			let from = field.selectionStart, to = field.selectionEnd; //Estos atributos devuelve la posición de la selección del texto que se 
+			//hace con el ratón dentro del textarea
+			field.value = field.value.slice(0, from) + word + field.value.slice(to);
+			field.selectionStart = from + word.length;
+			field.selectionEnd = from + word.length;
+		}
+
+		//Longitud de un texto
+		let text = document.getElementById("longitud");
+		let output = document.querySelector("#length");
+		text.addEventListener("input", () => {
+			output.textContent = text.value.length;
+		});
+
+		//Un checkbox es un conmutador binario. Su valor se puede extraer o cambiar a través de su propiedad checked, que tiene un valor 
+		//booleano.
+		let checkbox = document.querySelector("#purple");
+		checkbox.addEventListener("change", () => {
+			document.body.style.background = checkbox.checked ? "mediumpurple" : "";
+		});
+
+		let buttons = document.querySelectorAll("[name=color]");
+		for (let button of Array.from(buttons)) {
+			button.addEventListener("change", () => {
+				document.body.style.background = button.value;
+			});
+		}
+
+		let select = document.getElementById("calc");
+		let salida = document.querySelector("#output");
+		select.addEventListener("change", () => {
+			let number = 0;
+			for (let option of Array.from(select.options)) {
+				if (option.selected) number += Number(option.value);
+			}
+			salida.textContent = number;
+		});
+
+		let archivo = document.getElementById("archivo");
+		archivo.addEventListener("change", () => {
+			if (archivo.files.length > 0) {
+				let file = archivo.files[0];
+				console.log("You choose", file.name);
+				if (file.type) console.log("It has type", file.type);
+			}
+		});
+
+		let lector = document.getElementById("lector");
+		lector.addEventListener("change", () => {
+			for (let file of Array.from(lector.files)) {
+				let reader = new FileReader();
+				reader.addEventListener("load", () => {
+					console.log("File", file.name, "starts with", reader.result.slice(0, 20));
+				});
+				reader.readAsText(file);
+			}
+		});
+
+		//El objeto localStorage, se puede utilizar para almacenar datos de forma que sobrevivan a las recargas de la página
+		localStorage.setItem("username", "Ismael");
+		console.log(localStorage.getItem("username"));
+		localStorage.removeItem("username");
+
+		//El siguiente código implementa una aplicación para tomar notas. Mantiene un conjunto de notas con nombre y permite al usuario editar 
+		//y crear nuevas notas.
+
+		let list = document.getElementById("lista");
+		let note = document.getElementById("nota");
+
+		let state;
+		function setState(newState) {
+			list.textContent = "";
+			for (let name of Object.keys(newState.notes)) {
+				let option = document.createElement("option");
+				option.textContent = name;
+				if (newState.selected == name) option.selected = true;
+				list.appendChild(option);
+			}
+			note.value = newState.notes[newState.selected];
+
+			localStorage.setItem("Notes", JSON.stringify(newState));
+			state = newState;
+		}
+		setState(JSON.parse(localStorage.getItem("Notes")) || {
+			notes: {"shopping list": "Carrots\nRaisins"},
+			selected: "shopping list"
+		});
+
+		list.addEventListener("change", () => {
+			setState({notes: state.notes, selected: list.value});
+		});
+
+		note.addEventListener("change", () => {
+			setState({
+				notes: Object.assign({}, state.notes,
+									{[state.selected]: note.value}),
+				selected: state.selected
+			});
+		});
+
+		document.getElementById("boton").addEventListener("click", () => {
+			let name = prompt("Note name");
+			if (name) setState({
+				notes: Object.assign({}, state.notes, {[name]: ""}),
+				selected: name
+			});
+		});
+	</script>
+</html>
