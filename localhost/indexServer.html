@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8">
+		<title>Chapter 18</title>
+	</head>
+	<body>
+		<p>Index server chapter 18</p>
+	</body>
+	<script type="text/javascript">
+		//La interfaz a través de la cual JS puede realizar solicitudes HTTP a un servidor, se llama fetch, que devuelve una promesa. En el 
+		//ejemplo de abajo, response contiene información sobre la respuesta del servidor, que contiene un código de estado y encabezados.
+		fetch("data.txt").then(response => {
+			console.log(response.status);
+			console.log(response.headers.get("Content-Type"));
+		});
+
+		fetch("data.txt").then(resp => resp.text()).then(text => console.log(text));
+
+		//Un método similar, llamado json, devuelve una promesa que analiza un documento JSON.
+		//De forma predeterminada, fetch usa el método GET para realizar la solicitud y no incluye un cuerpo de solicitud. Se puede configurar 
+		//de manera diferente pasando un objeto con opciones adicionales como segundo argumento e.g.
+
+		fetch("data.txt", {method: "DELETE"}).then(resp => console.log(resp.status));
+
+		//La operación de arriba no se puede realizar y el servidor devuelve el código de estado 405 que significa "método no permitido".
+
+		//Para establecer encabezados, hay la opción headers e.g. la solicitud de abajo incluye un encabezado de rango, que indica al servidor 
+		//que devuelva solo una parte de la respuesta.
+
+		fetch("data.txt", {headers: {Range: "bytes=8-19"}}).then(resp => resp.text()).then(console.log);
+
+		//Access-Control-Allow-Origin: *, es una cabecera que los servidores incluyen en su respuesta para indicar explícitamente al navegador 
+		//que está bien que la solicitud provenga de otro dominio
+	</script>
+</html>
